@@ -1,5 +1,9 @@
-(ns cljquickjs.core
-  (:gen-class))
+;; QuickJS stand alone interpreter
+
+(ns cljquickjs.qjs
+  (:gen-class)
+  (:require [cljquickjs.core :refer :all])
+  (:import  [cljquickjs.core JSValue]))
 
   ; void help(void)
   ; {
@@ -28,16 +32,34 @@
 (defn help []
   (println "this is help"))
 
-(defn qjsmain
-  "I don't do a whole lot ... yet."
-  [& args] ; xxx unused
-  (if (seq *command-line-args*)
-    ; Foreach arg, print the arg...
-    (doseq [arg *command-line-args*]
-      (println "arg:" arg)
-    (cond
-      (= arg "help") (help))
-      )
+(defn JS_NewCustomContext
+  "xxx"
+  [rt]
+  (def ctx (JS_NewContext rt))
+  (js_init_module_std ctx "std")
+  (js_init_module_std ctx "os")
+  ctx)
 
-    ; Handle failure however here
+(defn eval-buf
+  "xxx"
+  [ctx buf filename eval_flags]
+  (println "eval-buf:" buf)
+  ;; (def jsval (JSValue.)))
+  (def jsval (JS_Eval ctx buf filename eval_flags))
+  ;; xxx https://github.com/bellard/quickjs/blob/204682fb87ab9312f0cf81f959ecd181180457bc/qjs.c#L70
+  0)
+
+(defn -main
+  "I don't do a whole lot ... yet."
+  [& args]
+  (def rt (JS_NewRuntime))
+  (def ctx (JS_NewCustomContext rt))
+  (if (seq args)
+    (doseq [arg args]
+      (println "arg:" arg)
+      (cond
+        (= arg "help") (help)
+        (= arg "-e") (eval-buf ctx (apply str (drop 1 args)) "<cmdline>" 0)))
+
     (throw (Exception. "Must have at least one argument!"))))
+

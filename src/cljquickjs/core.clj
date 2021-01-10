@@ -1,10 +1,19 @@
-(ns cljquickjs.core
-  (:gen-class))
+(ns cljquickjs.core)
 
-(load "qjs")
+(defrecord JSValue [])
 
-(defn -main
-  "I don't do a whole lot ... yet."
-  [& args]
-  (qjsmain "noop")
-  (println "core/main should do something"))
+(defrecord JSRuntime [])
+
+(defrecord JSContext [rt])
+
+(defn JS_NewRuntime [] (JSRuntime.))
+
+(defn JS_NewContext [rt] (JSContext. rt))
+
+(defn js_init_module_std [ctx module_name] "xxx")
+
+(defn JS_Eval
+  "xxx"
+  [ctx buf filename eval_flags]
+  (println "eval:" buf)
+  0)
